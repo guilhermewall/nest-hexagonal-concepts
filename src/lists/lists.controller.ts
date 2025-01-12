@@ -17,6 +17,7 @@ export class ListsController {
 
   @Post()
   async create(@Body() createListDto: CreateListDto) {
+    console.log("createListDto", createListDto);
     return await this.listsService.create(createListDto);
   }
 

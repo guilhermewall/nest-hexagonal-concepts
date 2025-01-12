@@ -1,32 +1,39 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { CreateListDto } from "./dto/create-list.dto";
 import { UpdateListDto } from "./dto/update-list.dto";
-import { PrismaService } from "../prisma/prisma.service";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { ListGatewayInterface } from "./gateways/list-gateway-interface";
+import { DataList } from "./entities/list.entity";
 
 @Injectable()
 export class ListsService {
   constructor(
-    private listGateway: ListGatewayInterface,
+    @Inject("ListGatewayInterface")
+    private listGateway: ListGatewayInterface, //uma porta, chamado tambem de Ports ou Adapters
     private httpService: HttpService
   ) {}
 
   async create(createListDto: CreateListDto) {
-    const newList = await this.prisma.list.create({ data: createListDto });
+    const list = new DataList(createListDto.name); // aqui aparentemente estaria so tratando os dados da requisição
+    console.log("list", list);
 
-    await lastValueFrom(this.httpService.post("lists", { name: newList.name }));
+    const newList = await this.listGateway.create(list);
+    console.log("newList", newList);
+
+    await lastValueFrom(
+      this.httpService.post("lists", { id: newList.id, name: newList.name })
+    );
 
     return newList;
   }
 
   async findAll() {
-    return await this.prisma.list.findMany();
+    return await this.listGateway.findAll();
   }
 
   async findOne(id: number) {
-    return await this.prisma.list.findUnique({ where: { id } });
+    return await this.listGateway.findById(id);
   }
 
   update(id: number, updateListDto: UpdateListDto) {

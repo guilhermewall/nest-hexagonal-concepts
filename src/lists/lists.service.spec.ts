@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ListsService } from "./lists.service";
 import { of } from "rxjs";
+import { ListGatewayInMemory } from "./gateways/list-gateway-in-memory";
 
 const mockList = {
   list: {
@@ -19,17 +20,17 @@ const mockHttpService = {
 
 describe("ListsService", () => {
   let service: ListsService;
-
+  let listGateway: ListGatewayInMemory;
   // antes de cada teste eu quero gerar...
 
   beforeEach(async () => {
-    service = new ListsService(mockList as any, mockHttpService as any);
+    listGateway = new ListGatewayInMemory();
+    service = new ListsService(listGateway, mockHttpService as any);
   });
 
   it("deve criar uma lista", async () => {
-    const list = await service.create({ name: "my list" });
-
-    console.log(list);
+    const list = await service.create({ name: "test new list" });
+    expect(listGateway.items).toEqual([list]);
   });
 
   // beforeEach(async () => {

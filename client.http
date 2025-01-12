@@ -5,5 +5,5 @@ POST {{baseUrl}}/lists
 Content-Type: application/json
 
 {
-  "name": "lista em branco 4"
+  "name": "testando novamente arquitetura"
 }
