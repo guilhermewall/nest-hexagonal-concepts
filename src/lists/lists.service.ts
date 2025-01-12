@@ -1,19 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { CreateListDto } from './dto/create-list.dto';
-import { UpdateListDto } from './dto/update-list.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateListDto } from "./dto/create-list.dto";
+import { UpdateListDto } from "./dto/update-list.dto";
+import { PrismaService } from "../prisma/prisma.service";
+import { HttpService } from "@nestjs/axios";
+import { lastValueFrom } from "rxjs";
+import { ListGatewayInterface } from "./gateways/list-gateway-interface";
 
 @Injectable()
 export class ListsService {
-  create(createListDto: CreateListDto) {
-    return 'This action adds a new list';
+  constructor(
+    private listGateway: ListGatewayInterface,
+    private httpService: HttpService
+  ) {}
+
+  async create(createListDto: CreateListDto) {
+    const newList = await this.prisma.list.create({ data: createListDto });
+
+    await lastValueFrom(this.httpService.post("lists", { name: newList.name }));
+
+    return newList;
   }
 
-  findAll() {
-    return `This action returns all lists`;
+  async findAll() {
+    return await this.prisma.list.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} list`;
+  async findOne(id: number) {
+    return await this.prisma.list.findUnique({ where: { id } });
   }
 
   update(id: number, updateListDto: UpdateListDto) {

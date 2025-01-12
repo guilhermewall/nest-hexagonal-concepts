@@ -1,18 +1,46 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ListsService } from './lists.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ListsService } from "./lists.service";
+import { of } from "rxjs";
 
-describe('ListsService', () => {
+const mockList = {
+  list: {
+    create: jest
+      .fn()
+      .mockReturnValue(Promise.resolve({ id: 5, name: "my list" })), //aqui estou declarando oq o metodo vai retornar e dizendo que é uma promessa
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    // Adicione outros métodos conforme necessário
+  },
+};
+
+const mockHttpService = {
+  post: jest.fn().mockReturnValue(of({ data: {} })),
+};
+
+describe("ListsService", () => {
   let service: ListsService;
 
+  // antes de cada teste eu quero gerar...
+
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [ListsService],
-    }).compile();
-
-    service = module.get<ListsService>(ListsService);
+    service = new ListsService(mockList as any, mockHttpService as any);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it("deve criar uma lista", async () => {
+    const list = await service.create({ name: "my list" });
+
+    console.log(list);
   });
+
+  // beforeEach(async () => {
+  //   const module: TestingModule = await Test.createTestingModule({
+  //     providers: [ListsService],
+  //   }).compile();
+
+  //   service = module.get<ListsService>(ListsService);
+  // });
+
+  // it('should be defined', () => {
+  //   expect(service).toBeDefined();
+  // });
 });
