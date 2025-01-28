@@ -4,6 +4,7 @@ import { ListsController } from "./lists.controller";
 import { PrismaModule } from "src/prisma/prisma.module";
 import { HttpModule } from "@nestjs/axios";
 import { ListGatewayPrisma } from "./gateways/list-gateway-prisma";
+import { ListGatewayHttp } from "./gateways/list-gateway-http";
 
 @Module({
   imports: [
@@ -16,9 +17,14 @@ import { ListGatewayPrisma } from "./gateways/list-gateway-prisma";
   providers: [
     ListsService,
     ListGatewayPrisma,
+    ListGatewayHttp,
     {
-      provide: "ListGatewayInterface",
+      provide: "ListPersistenceGateway",
       useClass: ListGatewayPrisma,
+    },
+    {
+      provide: "ListIntegrationGateway",
+      useClass: ListGatewayHttp,
     },
   ],
 })

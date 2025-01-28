@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { List } from "@prisma/client";
 
 @Injectable()
-class ListGatewayHttp implements ListGatewayInterface {
+export class ListGatewayHttp implements ListGatewayInterface {
   constructor(
     @Inject(HttpService)
     private httpService: HttpService

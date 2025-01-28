@@ -9,31 +9,31 @@ import { DataList } from "./entities/list.entity";
 @Injectable()
 export class ListsService {
   constructor(
-    @Inject("ListGatewayInterface")
-    private listGateway: ListGatewayInterface, //uma porta, chamado tambem de Ports ou Adapters
-    private httpService: HttpService
+    @Inject("ListPersistenceGateway")
+    private listPersistenceGateway: ListGatewayInterface, //uma porta, chamado tambem de Ports ou Adapters
+    @Inject("ListIntegrationGateway")
+    private listIntegrationGateway: ListGatewayInterface
   ) {}
 
   async create(createListDto: CreateListDto) {
     const list = new DataList(createListDto.name); // aqui aparentemente estaria so tratando os dados da requisição
     console.log("list", list);
 
-    const newList = await this.listGateway.create(list);
+    const newList = await this.listPersistenceGateway.create(list);
     console.log("newList", newList);
 
-    await lastValueFrom(
-      this.httpService.post("lists", { id: newList.id, name: newList.name })
-    );
+    // vamos validar isso !!
+    await this.listIntegrationGateway.create(list);
 
     return newList;
   }
 
   async findAll() {
-    return await this.listGateway.findAll();
+    return await this.listPersistenceGateway.findAll();
   }
 
   async findOne(id: number) {
-    return await this.listGateway.findById(id);
+    return await this.listPersistenceGateway.findById(id);
   }
 
   update(id: number, updateListDto: UpdateListDto) {
