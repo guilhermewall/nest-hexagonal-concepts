@@ -20,17 +20,30 @@ const mockHttpService = {
 
 describe("ListsService", () => {
   let service: ListsService;
-  let listGateway: ListGatewayInMemory;
+  let listPersistenceGateway: ListGatewayInMemory;
+  let listIntegrationGateway: ListGatewayInMemory;
   // antes de cada teste eu quero gerar...
 
   beforeEach(async () => {
-    listGateway = new ListGatewayInMemory();
-    service = new ListsService(listGateway, mockHttpService as any);
+    listPersistenceGateway = new ListGatewayInMemory();
+    listIntegrationGateway = new ListGatewayInMemory();
+    service = new ListsService(listPersistenceGateway, listIntegrationGateway);
   });
 
   it("deve criar uma lista", async () => {
     const list = await service.create({ name: "test new list" });
-    expect(listGateway.items).toEqual([list]);
+    expect(listPersistenceGateway.items).toEqual([
+      expect.objectContaining({
+        id: list.id,
+        name: list.name,
+      }),
+    ]);
+    expect(listIntegrationGateway.items).toEqual([
+      expect.objectContaining({
+        id: list.id,
+        name: list.name,
+      }),
+    ]);
   });
 
   // beforeEach(async () => {

@@ -5,6 +5,7 @@ import { DataList } from "../entities/list.entity";
 import { lastValueFrom } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 import { List } from "@prisma/client";
+import { create } from "domain";
 
 @Injectable()
 export class ListGatewayHttp implements ListGatewayInterface {
@@ -13,31 +14,25 @@ export class ListGatewayHttp implements ListGatewayInterface {
     private httpService: HttpService
   ) {}
 
-  private generateRandomId(): number {
-    return Math.floor(Math.random() * 1000);
-  }
-
-  async create(list: DataList): Promise<List> {
-    const newList = await lastValueFrom(
+  async create(data: DataList): Promise<List> {
+    const response = await lastValueFrom(
       this.httpService.post("lists", {
-        id: this.generateRandomId(),
-        name: list.name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        name: data.name,
       })
     );
 
-    return newList.data;
+    return response.data;
   }
 
   async findAll(): Promise<List[]> {
-    const lists = await lastValueFrom(this.httpService.get("lists"));
+    const response = await lastValueFrom(this.httpService.get("lists"));
 
-    return lists.data;
+    return response.data;
   }
 
-  async findById(id): Promise<List> {
-    const list = await lastValueFrom(this.httpService.get(`lists/${id}`));
-    return list.data;
+  async findById(id: number): Promise<List> {
+    const response = await lastValueFrom(this.httpService.get(`lists/${id}`));
+
+    return response.data;
   }
 }

@@ -22,8 +22,9 @@ export class ListsService {
     const newList = await this.listPersistenceGateway.create(list);
     console.log("newList", newList);
 
-    // vamos validar isso !!
-    await this.listIntegrationGateway.create(list);
+    try {
+      await this.listIntegrationGateway.create(list);
+    } catch (e) {}
 
     return newList;
   }
